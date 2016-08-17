@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.ionicframework.ionicgeolocationdemo761609" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>IonicGeolocationDemo</name>
+    <name>Pin.IO</name>
     <description>
-        An Ionic Framework and Cordova project.
+        Geo Location based Social Network App.
     </description>
-    <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+    <author email="peter@sitedisks.com.au" href="http://www.sitedisks.com.au/">
+      Peter Wang
     </author>
     <content src="index.html" />
     <access origin="*" />
@@ -19,6 +19,10 @@
     <feature name="StatusBar">
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>
+	<allow-navigation href="http://*/*" />
+    <allow-navigation href="https://*/*" />
+	<allow-intent href="*" />
+	<access origin="*" />
     <platform name="android">
         <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
         <icon density="mdpi" src="resources/android/icon/drawable-mdpi-icon.png" />
