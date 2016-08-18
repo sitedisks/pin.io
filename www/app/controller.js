@@ -4,6 +4,8 @@
     app.controller('MapController', ['$scope', '$cordovaGeolocation', '$ionicLoading', '$ionicPlatform',
         function ($scope, $cordovaGeolocation, $ionicLoading, $ionicPlatform) {
 
+			//var lat = -37.81198361286847, lng = 144.96133938623052;
+
             $ionicPlatform.ready(function () {
 
                 $ionicLoading.show({
@@ -18,9 +20,9 @@
 
                 $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
                     var lat = position.coords.latitude;
-                    var long = position.coords.longitude;
+                    var lng = position.coords.longitude;
 
-                    var myLatlng = new google.maps.LatLng(lat, long);
+                    var myLatlng = new google.maps.LatLng(lat, lng);
 
                     var mapOptions = {
                         center: myLatlng,
