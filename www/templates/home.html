@@ -1,0 +1,46 @@
+<ion-view view-title="Pin Map">
+    <ion-content>
+        
+		<div id="map" data-tap-disabled="true">
+            <button id="fab" class="button button-stable button-fab button-fab-bottom-right-second" data-ng-click="PinLoad()">
+                <i class="icon ion-android-locate"></i>
+            </button>
+            <button id="fab" class="button button-positive button-fab button-fab-bottom-right" data-ng-click="openModal()">
+                <i class="icon ion-plus"></i>
+            </button>
+        </div>
+        <script id="post-new-pin.html" type="text/ng-template">
+            <ion-modal-view>
+                <ion-header-bar class="bar-assertive">
+                    <h1 class="title">New Pin</h1>
+                    <button class="button button-icon button-clear ion-close" id="menu-popover" data-ng-click="closeModal()"></button>
+
+                </ion-header-bar>
+                <ion-content>
+                    <div class="list">
+                        <img ng-src="{{srcImage || 'http://placehold.it/350x350'}}" id="srcImage" width="350 " height="350" style="display: block; margin: 0 auto;" />
+                        <br />
+                        <div class="row">
+                            <div class="col text-center">
+                                <button class="button button-fab ink-dark button-assertive icon ion-camera" data-ng-click="takeImage()"></button>
+                                <button class="button button-fab ink-dark button-balanced icon ion-images" data-ng-click="chooseImage()"></button>
+                            </div>
+                        </div>
+
+                        <label class="item item-input item-floating-label">
+                            <span class="input-label" aria-label="Pin message" id="message-1">Message :></span>
+                            <textarea rows="6" placeholder="Message" data-ng-model="newPin.message"></textarea>
+
+                        </label>
+                        <ion-toggle data-ng-model="newPin.isPrivate">
+                            Private Pin?
+                        </ion-toggle>
+                        <button class="button button-block button-calm ink" data-ink-color="#9DEAFF" data-ink-opacity="1" data-ng-click="postNewPin(newPin)">
+                            Submit
+                        </button>
+                    </div>
+                </ion-content>
+            </ion-modal-view>
+        </script>
+	</ion-content>
+</ion-view>

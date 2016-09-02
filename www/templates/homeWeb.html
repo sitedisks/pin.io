@@ -1,0 +1,160 @@
+<ion-view view-title="Pin Map">
+    <ion-content>
+        <button id="fab" class="button button-stable button-fab button-fab-bottom-right-second" data-ng-click="locationLoad()">
+            <i class="icon ion-android-locate"></i>
+        </button>
+        <button id="fab" class="button button-positive button-fab button-fab-bottom-left" data-ng-click="openNewPinModal()">
+            <i class="icon ion-plus"></i>
+        </button>
+        <div id="map" data-tap-disabled="true"></div>
+
+        <script id="post-new-pin.html" type="text/ng-template">
+            <ion-modal-view>
+                <ion-header-bar class="bar-assertive">
+                    <h1 class="title">New Pin</h1>
+                    <button class="button button-icon button-clear ion-close" id="menu-popover" data-ng-click="closeNewPinModal()"></button>
+
+                </ion-header-bar>
+                <ion-content>
+                    <div class="list">
+                        <img ng-src="{{srcImage || 'http://placehold.it/350x350'}}" id="srcImage" width="350 " height="350" style="display: block; margin: 0 auto;" />
+                        <br />
+                        <div class="row">
+                            <div class="col text-center">
+                                <button class="button button-fab ink-dark button-assertive icon ion-camera" data-ng-click="takeImage()"></button>
+                                <button class="button button-fab ink-dark button-balanced icon ion-images" data-ng-click="chooseImage()"></button>
+                            </div>
+                        </div>
+
+                        <label class="item item-input item-floating-label">
+                            <span class="input-label" aria-label="Pin message" id="message-1">Message :></span>
+                            <textarea rows="6" placeholder="Message" data-ng-model="newPin.message"></textarea>
+
+                        </label>
+                        <ion-toggle data-ng-model="newPin.isPrivate">
+                            Private Pin?
+                        </ion-toggle>
+                        <button class="button button-block button-calm ink" data-ink-color="#9DEAFF" data-ink-opacity="1" data-ng-click="postNewPin(newPin)">
+                            Submit
+                        </button>
+                    </div>
+                </ion-content>
+            </ion-modal-view>
+        </script>
+        <script id="load-details-pin.html" type="text/ng-template">
+            <ion-modal-view>
+                <ion-header-bar class="bar-balanced">
+                    <h1 class="title"></h1>
+                    <button class="button button-icon button-clear ion-close" id="menu-popover" data-ng-click="closePinDetailsModal()"></button>
+                </ion-header-bar>
+                <ion-content>
+
+                    <!-- Cards -->
+                    <div class="list card stable-bg">
+                        <div class="item item-avatar">
+                            <img src="img/arya.jpg">
+                            <h2>{{pinDetail.UserId}}</h2>
+                            <p>{{pinDetail.Token}}</p>
+                        </div>
+                        <div class="item item-body">
+                            <label class="item item-input item-floating-label">
+                                {{pinDetail.Text}}
+                            </label>
+                            <p>
+                                <a class="subdued">1 Like</a>
+                                <a class="subdued">5 Comments</a>
+                            </p>
+                        </div>
+                        <div class="item tabs tabs-secondary tabs-icon-left">
+                            <a class="tab-item" data-ink-color="#336699" data-ink-opacity="0.5">
+                                <i class="icon ion-thumbsup"></i> Like
+                            </a>
+                            <a class="tab-item" data-ink-color="#336699" data-ink-opacity="0.5">
+                                <i class="icon ion-chatbox"></i> Comment
+                            </a>
+                            <a class="tab-item" data-ink-color="#336699" data-ink-opacity="0.5">
+                                <i class="icon ion-share"></i> Share
+                            </a>
+                        </div>
+                    </div>
+                    <!--<div class="list card stable-border">
+                        <div class="item item-body">
+                            <ion-item nav-clear menu-close class="item-icon-right item-avatar">
+                                <img src="img/material4.jpg">
+                                <h2>user</h2>
+                                <p>Comments1</p>
+                                <i class="icon ion-chatbubble muted"></i>
+                            </ion-item>
+                        </div>
+                    </div>-->
+              
+                    <ion-list>
+                        <ion-item class="message-wrapper">
+                            <img class="profile-pic left" src="img/material4.jpg" />
+
+                            <div class="chat-bubble left">
+
+                                <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
+                                <div class="message">Blah</div>
+
+                                <div class="message-detail">
+                                    <span class="bold">cwan40</span>,
+                                    <span>8 mins ago</span>
+                                </div>
+
+                            </div>
+                        </ion-item>
+                        <ion-item class="message-wrapper">
+                            <img class="profile-pic right" src="img/material4.jpg" />
+
+                            <div class="chat-bubble right">
+
+                                <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
+                                <div class="message">An unhandled exception occurred during the execution of the current web request. Please review the stack trace for more information about the error and where it originated in the code.</div>
+
+                                <div class="message-detail">
+                                    <span class="bold">cwan40</span>,
+                                    <span>8 mins ago</span>
+                                </div>
+
+                            </div>
+                        </ion-item>
+                    </ion-list>
+                </ion-content>
+
+                <form name="sendMessageForm" ng-submit="sendMessage(sendMessageForm)" novalidate>
+                    <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach>
+                        <label class="item-input-wrapper">
+                            <!--<textarea ng-model="input.message" value="" placeholder="Send a message..." required minlength="1" maxlength="1500" msd-elastic></textarea>-->
+                            <textarea ng-model="input.message" value="" placeholder="Send a message..." required minlength="1" maxlength="1500"></textarea>
+                        </label>
+                        <div class="footer-btn-wrap">
+                            <button class="button button-icon icon ion-android-send footer-btn" type="submit"
+                                    ng-disabled="!input.message || input.message === ''"></button>
+                        </div>
+                    </ion-footer-bar>
+                </form>
+
+                <!--<ion-footer-bar align-title="left" class="bar-assertive">
+                    <div class="buttons">
+                        <button class="button">Left Button</button>
+                    </div>
+                    <h1 class="title">Title!</h1>
+                    <div class="buttons" ng-click="doSomething()">
+                        <button class="button">Right Button</button>
+                    </div>
+                </ion-footer-bar>-->
+                
+                <!--<div class="bar bar-footer item-input-inset">
+                    <label class="item-input-wrapper">
+                        <i class="icon ion-ios7-search placeholder-icon"></i>
+                        <input type="search" placeholder="Search">
+                    </label>
+                    <button class="button button-clear">
+                        Cancel
+                    </button>
+                </div>-->
+            </ion-modal-view>
+        </script>
+    </ion-content>
+</ion-view>
