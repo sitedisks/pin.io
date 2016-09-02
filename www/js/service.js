@@ -9,8 +9,10 @@
 
             var service = {
                 reload: reload,
-                postPin: postPin,
-                loadPin: loadPin,
+
+                pinSvc: pinSvc,
+                commentSvc: commentSvc,
+                
                 loading: loading,
                 hideloading: hideloading
             };
@@ -18,17 +20,17 @@
             return service;
 
             function reload() {
-                return $resource(useEndpoint + '/pins/reload', {},
-                    { 'save': { method: 'POST', isArray: true } }
+                return $resource(useEndpoint + '/location/reload', {},
+                    { 'refresh': { method: 'POST', isArray: true } }
                 );
             }
 
-            function postPin() {
-                return $resource(useEndpoint + '/pins');
+            function pinSvc() {
+                return $resource(useEndpoint + '/pins/:pinId', { pinId: '@pid' });
             }
 
-            function loadPin() {
-                return $resource(useEndpoint + '/pins/details?pinId=:pinId', { pinId: '@id' });
+            function commentSvc() {
+                return $resource(useEndpoint + '/pins/:pinId/comments', { pinId: '@pid' });
             }
 
             function loading() {

@@ -26,6 +26,7 @@
                 $scope.openPinDetailsModal = openPinDetailsModal;
                 $scope.closePinDetailsModal = closePinDetailsModal;
                 $scope.postNewPin = postNewPin;
+                $scope.postNewComment = postNewComment;
 
                 // functions
                 function locationLoad() {
@@ -111,7 +112,7 @@
                             }
                         };
 
-                        pinService.reload().save(currentLocation,
+                        pinService.reload().refresh(currentLocation,
                             function (data) {
                                 // data: nearBy 20 pins (include unreadable)
                                 if (data.length > 0) {
@@ -175,7 +176,7 @@
 
                         google.maps.event.addListener(marker, 'click', function () {
                             pinService.loading(); // spin loading
-                            pinService.loadPin().get({ pinId: pin.Id },
+                            pinService.pinSvc().get({ pinId: pin.Id },
                                 function (pinData) {
                                     pinService.hideloading();
                                     $scope.pinDetail = pinData;
@@ -212,7 +213,6 @@
                     markersArray = [];
                 }
 
-                // set latLng
                 function setPosition(lat, lng) {
                     return new google.maps.LatLng(lat, lng);
                 }
@@ -277,7 +277,7 @@
                     $scope.pinDetailsModal.hide();
                 }
 
-                function postNewPin (newpin) {
+                function postNewPin(newpin) {
 
                     var pin = {
                         "Token": token,
@@ -287,7 +287,7 @@
                         "IsPrivate": newpin.isPrivate
                     };
 
-                    pinService.postPin().save(pin,
+                    pinService.pinSvc().save(pin,
                         function (data) {
                             // new pin stored in mysql and mongo
                             $scope.newPinModal.hide();
@@ -296,6 +296,10 @@
                         }, function (error) {
                             // error handle
                         });
+
+                }
+
+                function postNewComment(newcomment) {
 
                 }
 
@@ -322,17 +326,3 @@
 
         }]);
 })();
-
-/*
-map.addMarker({
-    'position': GOOGLE_TOKYO,
-    'title': 'Google Tokyo!'
-}, function (marker) {
-    marker.setIcon({
-        'url': 'http://.../image.png',
-        'size': {
-            width: 75,
-            height: 75
-        }
-    });
-});*/
