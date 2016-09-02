@@ -299,8 +299,19 @@
 
                 }
 
-                function postNewComment(newcomment) {
+                function postNewComment(commentObj) {
+                    var comment = {
+                        "Token": token,
+                        "Comment": commentObj.message,
+                        "Latitude": currentLat,
+                        "Longitude": currentLng
+                    };
 
+                    pinService.commentSvc().save({ pinId: $scope.pinDetail.Id }, comment,
+                        function (data) {
+                            //what happens once submit comment
+                        },
+                        function (error) { });
                 }
 
                 // initial
