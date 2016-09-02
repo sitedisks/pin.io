@@ -1,7 +1,7 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation) {
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation) {
 
             var token;
             var map;
@@ -180,13 +180,21 @@
                                 function (pinData) {
                                     pinService.hideloading();
                                     $scope.pinDetail = pinData;
+
                                     if (pinData.Id != null) {
-                                        //alert(pinData.Text);
+                                        // get all comments for this PIN
+                                        pinService.commentSvc().query({ pinId: pinData.Id },
+                                            function (data) {
+                                                $scope.pinComments = data;
+                                            }, function (error) {
+
+                                                errorHandler();
+                                            });
+
                                         openPinDetailsModal();
                                     }
                                     else {
-                                        //alert("Pin info not in mysql");
-                                        openPinDetailsModal();
+                                        errorHandler();
                                     }
                                 }, function (error) {
                                     //log the error
@@ -200,6 +208,13 @@
                         markersArray.push(marker);
                     }
 
+                }
+
+                function errorHandler() {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Unknow Error',
+                        template: 'Please reload the app try again'
+                    });
                 }
 
                 function setMapOnAll(map) {
@@ -318,6 +333,11 @@
                 tokenLoad(); // set the device unique token
                 locationLoad();
  
+            });
+
+            // Cleanup the modal when we're done with it
+            $scope.$on('$destroy', function () {
+                $scope.modal.remove();
             });
 
             // register modal templates

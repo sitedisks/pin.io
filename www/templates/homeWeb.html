@@ -77,47 +77,36 @@
                             </a>
                         </div>
                     </div>
-                    <!--<div class="list card stable-border">
-                        <div class="item item-body">
-                            <ion-item nav-clear menu-close class="item-icon-right item-avatar">
-                                <img src="img/material4.jpg">
-                                <h2>user</h2>
-                                <p>Comments1</p>
-                                <i class="icon ion-chatbubble muted"></i>
-                            </ion-item>
-                        </div>
-                    </div>-->
-              
+                     
                     <ion-list>
-                        <ion-item class="message-wrapper">
-                            <img class="profile-pic left" src="img/material4.jpg" />
+                        <ion-item class="message-wrapper" data-ng-repeat="comment in pinComments">
+                            <div ng-if="pinDetail.UserId !== comment.CommenterId">
+                                <img class="profile-pic left" src="img/material4.jpg" />
 
-                            <div class="chat-bubble left">
+                                <div class="chat-bubble left">
+                                    <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
+                                    <div class="message">{{comment.Comment}}</div>
 
-                                <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
-                                <div class="message">Blah</div>
-
-                                <div class="message-detail">
-                                    <span class="bold">cwan40</span>,
-                                    <span>8 mins ago</span>
+                                    <div class="message-detail">
+                                        <span class="bold">{{comment.CommenterDisplayName}}</span>,
+                                        <span>{{comment.CommentDateTime}}</span>
+                                    </div>
                                 </div>
-
                             </div>
-                        </ion-item>
-                        <ion-item class="message-wrapper">
-                            <img class="profile-pic right" src="img/material4.jpg" />
+                            <div ng-if="pinDetail.UserId === comment.CommenterId">
+                                <img class="profile-pic right" src="img/material4.jpg" />
 
-                            <div class="chat-bubble right">
+                                <div class="chat-bubble right">
+                                    <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
+                                    <div class="message">{{comment.Comment}}</div>
 
-                                <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
-                                <div class="message">An unhandled exception occurred during the execution of the current web request. Please review the stack trace for more information about the error and where it originated in the code.</div>
-
-                                <div class="message-detail">
-                                    <span class="bold">cwan40</span>,
-                                    <span>8 mins ago</span>
+                                    <div class="message-detail">
+                                        <span class="bold">{{comment.CommenterDisplayName}}</span>,
+                                        <span>{{comment.CommentDateTime}}</span>
+                                    </div>
                                 </div>
-
                             </div>
+                            <div class="cf"></div>
                         </ion-item>
                     </ion-list>
                 </ion-content>
