@@ -336,10 +336,23 @@
  
             });
 
+
             // Cleanup the modal when we're done with it
             $scope.$on('$destroy', function () {
-                $scope.modal.remove();
+                alert('destory');
             });
+
+            // Execute action on hide modal
+            $scope.$on('modal.hidden', function () {
+                // Execute action
+                alert('hidden');
+            });
+            // Execute action on remove modal
+            $scope.$on('modal.removed', function () {
+                // Execute action
+                alert(removed);
+            });
+
 
             // register modal templates
             $ionicModal.fromTemplateUrl('post-new-pin.html', {
