@@ -183,7 +183,8 @@
 
                                     if (pinData.Id != null) {
                                         // get all comments for this PIN
-                                        pinService.commentSvc().query({ pinId: pinData.Id },
+                                        var commentPage = 1;
+                                        pinService.commentSvc(commentPage).query({ pinId: pinData.Id },
                                             function (data) {
                                                 $scope.pinComments = data;
                                             }, function (error) {

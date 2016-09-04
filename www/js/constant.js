@@ -15,6 +15,9 @@
     }).constant("defaultLocation", {
         "lat": -37.8141,
         "lng": 144.9633
+    }).constant("pagination", {
+        defaultPage: 1,
+        row: 5
     });
 
 })();
