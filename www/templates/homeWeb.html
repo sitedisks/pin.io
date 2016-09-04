@@ -48,7 +48,9 @@
                     <button class="button button-icon button-clear ion-close" id="menu-popover" data-ng-click="closePinDetailsModal()"></button>
                 </ion-header-bar>
                 <ion-content>
-
+                    <ion-refresher pulling-text="Pull to refresh..."
+                                   on-refresh="getMoreComments()">
+                    </ion-refresher>
                     <!-- Cards -->
                     <div class="list card stable-bg">
                         <div class="item item-avatar">

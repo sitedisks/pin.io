@@ -27,6 +27,7 @@
                 $scope.closePinDetailsModal = closePinDetailsModal;
                 $scope.postNewPin = postNewPin;
                 $scope.postNewComment = postNewComment;
+                $scope.getMoreComments = getMoreComments;
 
                 // functions
                 function locationLoad() {
@@ -281,6 +282,7 @@
                 function closeNewPinModal() {
                     //$scope.map.setClickable(true);
                     $scope.newPinModal.hide();
+                    //$scope.newPinModal.remove();
                 }
 
                 function openPinDetailsModal() {
@@ -291,6 +293,7 @@
                 function closePinDetailsModal() {
                     //$scope.map.setClickable(true);
                     $scope.pinDetailsModal.hide();
+                    //$scope.pinDetailsModal.remove();
                 }
 
                 function postNewPin(newpin) {
@@ -330,6 +333,14 @@
                         function (error) { });
                 }
 
+                function getMoreComments() {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'More',
+                        template: 'I want more comments'
+                    });
+                    $scope.$broadcast('scroll.refreshComplete');
+                }
+
                 // initial
                 tokenLoad(); // set the device unique token
                 locationLoad();
@@ -339,18 +350,35 @@
 
             // Cleanup the modal when we're done with it
             $scope.$on('$destroy', function () {
-                alert('destory');
+                var alertPopup = $ionicPopup.alert({
+                    title: 'destroy',
+                    template: 'general destroy'
+                });
+               
             });
-
             // Execute action on hide modal
             $scope.$on('modal.hidden', function () {
-                // Execute action
-                alert('hidden');
+
+                // clean up modal
+                $scope.newPin = {
+                    message: '',
+                    isPrivate: false
+                };
+                $scope.pinDetail = null;
+                $scope.pinComments = [];
+
+                //var alertPopup = $ionicPopup.alert({
+                //    title: 'hidden',
+                //    template: 'general hidden'
+                //});
+              
             });
             // Execute action on remove modal
             $scope.$on('modal.removed', function () {
-                // Execute action
-                alert(removed);
+                var alertPopup = $ionicPopup.alert({
+                    title: 'removed',
+                    template: 'general removed'
+                });
             });
 
 
