@@ -1,7 +1,7 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation) {
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination) {
 
             var token;
             var map;
@@ -9,14 +9,13 @@
             var currentLat = defaultLocation.lat;
             var currentLng = defaultLocation.lng;
             var markersArray = [];
+            var commentPage = 1;
+            var commentTotal = -1;
 
             // 1> device ready
             $ionicPlatform.ready(function () {
 
-                $scope.newPin = {
-                    message: '',
-                    isPrivate: false
-                };
+                scopeVariables();
 
                 $scope.locationLoad = locationLoad;
                 $scope.takeImage = takeImage;
@@ -27,7 +26,9 @@
                 $scope.closePinDetailsModal = closePinDetailsModal;
                 $scope.postNewPin = postNewPin;
                 $scope.postNewComment = postNewComment;
-                $scope.getMoreComments = getMoreComments;
+                $scope.refreshComments = refreshComments;
+                $scope.loadComments = loadComments;
+                $scope.moreDataCanBeLoaded = moreDataCanBeLoaded;
 
                 // functions
                 function locationLoad() {
@@ -53,6 +54,8 @@
                         MapLoad();
                     });
                 }
+
+
 
                 function tokenLoad() {
                     try {
@@ -184,14 +187,7 @@
 
                                     if (pinData.Id != null) {
                                         // get all comments for this PIN
-                                        var commentPage = 1;
-                                        pinService.commentSvc(commentPage).query({ pinId: pinData.Id },
-                                            function (data) {
-                                                $scope.pinComments = data;
-                                            }, function (error) {
-
-                                                errorHandler();
-                                            });
+                                        loadComments(commentPage, $scope.pinDetail.Id);
 
                                         openPinDetailsModal();
                                     }
@@ -333,20 +329,54 @@
                         function (error) { });
                 }
 
-                function getMoreComments() {
+                function refreshComments() {
                     var alertPopup = $ionicPopup.alert({
-                        title: 'More',
-                        template: 'I want more comments'
+                        title: 'Refresh',
+                        template: 'Comments refreshed'
                     });
                     $scope.$broadcast('scroll.refreshComplete');
+                }
+
+                function loadComments() {
+                    if ($scope.pinDetail) {
+                        pinService.commentSvc(commentPage).get({ pinId: $scope.pinDetail.Id },
+                            function (data) {
+                                commentTotal = data.total;
+                                var list = data.list;
+
+                                angular.forEach(list, function (item) {
+                                    $scope.pinComments.push(item);
+                                });
+                                commentPage++;
+
+                                $scope.$broadcast('scroll.infiniteScrollComplete');
+                            }, function (error) {
+
+                                errorHandler();
+                            });
+                    }
+
+                }
+
+                function moreDataCanBeLoaded() {
+                    if (commentTotal == -1)
+                        return true;
+                    if ($scope.pinComments.length < commentTotal)
+                        return true;
+                    return false;
                 }
 
                 // initial
                 tokenLoad(); // set the device unique token
                 locationLoad();
- 
+
             });
 
+            function scopeVariables() {
+                $scope.pinDetail = null;
+                $scope.pinComments = [];
+                $scope.newPin = { message: '', isPrivate: false };
+            }
 
             // Cleanup the modal when we're done with it
             $scope.$on('$destroy', function () {
@@ -354,24 +384,20 @@
                     title: 'destroy',
                     template: 'general destroy'
                 });
-               
+
             });
             // Execute action on hide modal
             $scope.$on('modal.hidden', function () {
 
-                // clean up modal
-                $scope.newPin = {
-                    message: '',
-                    isPrivate: false
-                };
-                $scope.pinDetail = null;
-                $scope.pinComments = [];
-
+                // clean up scope variables
+                scopeVariables();
+                commentPage = 1;
+                commentTotal = -1;
                 //var alertPopup = $ionicPopup.alert({
                 //    title: 'hidden',
                 //    template: 'general hidden'
                 //});
-              
+
             });
             // Execute action on remove modal
             $scope.$on('modal.removed', function () {

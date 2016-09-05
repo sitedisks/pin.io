@@ -4,8 +4,8 @@
     app.service('pinService', ['$resource', '$ionicLoading', 'endpoint', 'pagination',
         function ($resource, $ionicLoading, endpoint, pagination) {
 
-            var useEndpoint = endpoint.LiveAPI;
-            //var useEndpoint = endpoint.LocalAPI;
+            //var useEndpoint = endpoint.LiveAPI;
+            var useEndpoint = endpoint.LocalAPI;
 
             var service = {
                 reload: reload,

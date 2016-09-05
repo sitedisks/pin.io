@@ -48,9 +48,8 @@
                     <button class="button button-icon button-clear ion-close" id="menu-popover" data-ng-click="closePinDetailsModal()"></button>
                 </ion-header-bar>
                 <ion-content>
-                    <ion-refresher pulling-text="Pull to refresh..."
-                                   on-refresh="getMoreComments()">
-                    </ion-refresher>
+                    <ion-refresher pulling-text="Pull to refresh..." on-refresh="refreshComments()"></ion-refresher>
+                    
                     <!-- Cards -->
                     <div class="list card stable-bg">
                         <div class="item item-avatar">
@@ -111,6 +110,9 @@
                             <div class="cf"></div>
                         </ion-item>
                     </ion-list>
+
+                    <ion-infinite-scroll ng-if="moreDataCanBeLoaded()" on-infinite="loadComments()" distance="1%"></ion-infinite-scroll>
+
                 </ion-content>
 
                 <form name="commentForm" data-ng-submit="postNewComment(commentObj)" novalidate>
