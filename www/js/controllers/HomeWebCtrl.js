@@ -245,6 +245,8 @@
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
                         $scope.srcImage = "data:image/jpeg;base64," + imageData;
+                        $scope.picData = imageData;
+                        $scope.ftLoad = true;
                     }, function (err) {
                         // error
                     });
@@ -265,9 +267,18 @@
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
                         $scope.srcImage = "data:image/jpeg;base64," + imageData;
+
+                        window.resolveLocalFileSystemURI(imageData, function (fileEntry) {
+                            $scope.picData = fileEntry.nativeURL;
+                            $scope.ftLoad = true;
+                        });
                     }, function (err) {
                         // error
                     });
+                }
+
+                function uploadPicture() {
+                    // read: https://forum.ionicframework.com/t/working-example-to-upload-photo-from-camera-or-galley-with-ngcordova/12852
                 }
 
                 function openNewPinModal() {
@@ -376,6 +387,8 @@
                 $scope.pinDetail = null;
                 $scope.pinComments = [];
                 $scope.newPin = { message: '', isPrivate: false };
+                $scope.picData = null;
+                $scope.ftLoad = false;
             }
 
             // Cleanup the modal when we're done with it
