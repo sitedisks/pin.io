@@ -1,0 +1,13 @@
+﻿
+<ion-view view-title="People nearby">
+    <ion-content>
+        <h2>People nearby</h2>
+        {{message}}
+
+        <ion-list>
+            <ion-item ng-repeat="playlist in playlists" href="#/app/people/{{playlist.id}}">
+                {{playlist.title}}
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

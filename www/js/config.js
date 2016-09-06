@@ -19,10 +19,32 @@
 		            //templateUrl: 'templates/home.html',
 		            //controller: 'HomeCtrl'
 		            templateUrl: 'templates/homeWeb.html',
-                    controller: 'HomeWebCtrl'
+		            controller: 'HomeWebCtrl'
 		        }
 		    }
 		})
+
+        .state('app.people', {
+            url: '/people',
+            views: {
+                'menuContent': {
+                    templateUrl: 'templates/people.html',
+                    controller: 'PeopleCtrl'
+
+                }
+            }
+        })
+
+        .state('app.peopleDetail', {
+            url: '/people/:peopleId',
+            views: {
+                'menuContent': {
+                    templateUrl: 'templates/peopleDetail.html',
+                    controller: 'PeopleDetailCtrl'
+
+                }
+            }
+        })
 
 		.state('app.lists', {
 		    url: '/lists',
