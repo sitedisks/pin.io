@@ -1,7 +1,7 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination) {
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination) {
 
             var token;
             var map;
@@ -29,6 +29,7 @@
                 $scope.refreshComments = refreshComments;
                 $scope.loadComments = loadComments;
                 $scope.moreDataCanBeLoaded = moreDataCanBeLoaded;
+                $scope.testCameraFile = testCameraFile;
 
                 // functions
                 function locationLoad() {
@@ -233,7 +234,7 @@
                 function takeImage() {
                     var options = {
                         quality: 80,
-                        destinationType: Camera.DestinationType.DATA_URL,
+                        destinationType: Camera.DestinationType.FILE_URI,
                         sourceType: Camera.PictureSourceType.CAMERA,
                         allowEdit: true,
                         encodingType: Camera.EncodingType.JPEG,
@@ -244,9 +245,31 @@
                     };
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
-                        $scope.srcImage = "data:image/jpeg;base64," + imageData;
+                        //$scope.srcImage = "data:image/jpeg;base64," + imageData;
+                        $scope.srcImage = imageData;
                         $scope.picData = imageData;
                         $scope.ftLoad = true;
+
+                        var options = {
+                            fileKey: "file",
+                            fileName: filename,
+                            chunkedMode: false, // ?
+                            mimeType: "image/jpg",
+                            params: { 'directory': 'upload', 'fileName': filename } // directory represents remote directory,  fileName represents final remote file name
+                        };
+
+                        //return $cordovaFileTransfer.upload('http://example.com', filePath, options).then(onSuccess, onError, onProgress);
+                        // https://www.thepolyglotdeveloper.com/2015/01/upload-files-remote-server-using-ionic-framework/
+                        // http://www.gajotres.net/using-cordova-file-transfer-plugin-with-ionic-framework/2/
+
+                        //$cordovaFileTransfer.upload(url, targetPath, options).then(function (result) {
+                        //    console.log("SUCCESS: " + JSON.stringify(result.response));
+                        //}, function (err) {
+                        //    console.log("ERROR: " + JSON.stringify(err));
+                        //}, function (progress) {
+                        //    // PROGRESS HANDLING GOES HERE
+                        //});
+
                     }, function (err) {
                         // error
                     });
@@ -255,7 +278,7 @@
                 function chooseImage() {
                     var options = {
                         quality: 80,
-                        destinationType: Camera.DestinationType.DATA_URL,
+                        destinationType: Camera.DestinationType.FILE_URI,
                         sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
                         allowEdit: true,
                         encodingType: Camera.EncodingType.JPEG,
@@ -267,14 +290,20 @@
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
                         $scope.srcImage = "data:image/jpeg;base64," + imageData;
+                        $scope.srcImage = imageData;
+                        $scope.picData = imageData;
+                        $scope.ftLoad = true;
 
-                        window.resolveLocalFileSystemURI(imageData, function (fileEntry) {
-                            $scope.picData = fileEntry.nativeURL;
-                            $scope.ftLoad = true;
-                        });
+                        //window.resolveLocalFileSystemURI(imageData, function (fileEntry) {
+                        //    $scope.srcImage = fileEntry.nativeURL;
+                        //    $scope.picData = fileEntry.nativeURL;
+                        //    $scope.ftLoad = true;
+                        //});
                     }, function (err) {
                         // error
                     });
+
+                    //$cordovaCamera.cleanup().then(); // only for FILE_URI
                 }
 
                 function uploadPicture() {
@@ -375,6 +404,10 @@
                     if ($scope.pinComments.length < commentTotal)
                         return true;
                     return false;
+                }
+
+                function testCameraFile() {
+                    alert($scope.picData);
                 }
 
                 // initial
