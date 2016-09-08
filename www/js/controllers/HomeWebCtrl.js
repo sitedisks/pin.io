@@ -265,10 +265,11 @@
                         // https://www.thepolyglotdeveloper.com/2015/01/upload-files-remote-server-using-ionic-framework/
                         // http://www.gajotres.net/using-cordova-file-transfer-plugin-with-ionic-framework/2/
 
-                        $cordovaFileTransfer.upload(useEndpoint + '/pins/image', $scope.srcImage, options).then(function (result) {
-                            alert("SUCCESS: " + JSON.stringify(result.response));
+                        var imageServer = useEndpoint + '/pins/image';
+                        $cordovaFileTransfer.upload(imageServer, $scope.srcImage, options).then(function (result) {
+                            alert("server: " + imageServer + ". SUCCESS: " + JSON.stringify(result.response));
                         }, function (err) {
-                            alert("ERROR: " + JSON.stringify(err));
+                            alert("server: " + imageServer + ". ERROR: " + JSON.stringify(err));
                         }, function (progress) {
                             // PROGRESS HANDLING GOES HERE
                         });
