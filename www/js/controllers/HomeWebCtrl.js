@@ -1,7 +1,10 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination) {
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 'endpoint',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, endpoint) {
+
+            var useEndpoint = endpoint.LiveAPI;
+            //var useEndpoint = endpoint.LocalAPI;
 
             var token;
             var map;
@@ -252,23 +255,23 @@
 
                         var options = {
                             fileKey: "file",
-                            fileName: filename,
+                            fileName: "TestImage",
                             chunkedMode: false, // ?
                             mimeType: "image/jpg",
-                            params: { 'directory': 'upload', 'fileName': filename } // directory represents remote directory,  fileName represents final remote file name
+                            params: { 'directory': 'upload', 'fileName': "TestImage" } // directory represents remote directory,  fileName represents final remote file name
                         };
 
-                        //return $cordovaFileTransfer.upload('http://example.com', filePath, options).then(onSuccess, onError, onProgress);
+                        //$cordovaFileTransfer.upload(useEndpoint + '/pins/image', $scope.srcImage, options).then(onSuccess, onError, onProgress);
                         // https://www.thepolyglotdeveloper.com/2015/01/upload-files-remote-server-using-ionic-framework/
                         // http://www.gajotres.net/using-cordova-file-transfer-plugin-with-ionic-framework/2/
 
-                        //$cordovaFileTransfer.upload(url, targetPath, options).then(function (result) {
-                        //    console.log("SUCCESS: " + JSON.stringify(result.response));
-                        //}, function (err) {
-                        //    console.log("ERROR: " + JSON.stringify(err));
-                        //}, function (progress) {
-                        //    // PROGRESS HANDLING GOES HERE
-                        //});
+                        $cordovaFileTransfer.upload(useEndpoint + '/pins/image', $scope.srcImage, options).then(function (result) {
+                            alert("SUCCESS: " + JSON.stringify(result.response));
+                        }, function (err) {
+                            alert("ERROR: " + JSON.stringify(err));
+                        }, function (progress) {
+                            // PROGRESS HANDLING GOES HERE
+                        });
 
                     }, function (err) {
                         // error
