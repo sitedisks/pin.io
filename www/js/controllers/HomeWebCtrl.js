@@ -39,14 +39,14 @@
                     Upload.upload({
                         url: useEndpoint + '/pins/s3Image',
                         method: 'POST',
-                        data: { file: file, 'directory': 'upload', 'fileName': 'TestImage', 'UserName': 'SiteDev' }
+                        data: { file: file, 'directory': 'upload', 'fileName': 'TestImage', 'UserName': 'testesttest' }
                     }).then(function (resp) {
-                        console.log('Success [' + resp.config.data.file.name + '] uploaded. Response: ' + resp.data.ImageId);
+                        console.log('Success [' + resp.config.data.file.name + '] uploaded. Response: ' + resp.data);
                     }, function (resp) {
                         console.log('Error status: ' + resp.status);
                     }, function (evt) {
                         $scope.bannerProgress = parseInt(100.0 * evt.loaded / evt.total);
-                        console.log('progress: ' + $scope.bannerProgress + '% ' + evt.config.data.file.name);
+                        console.log('progress: ' + $scope.bannerProgress + '% ');
                     });
                 }
 
