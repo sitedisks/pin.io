@@ -17,6 +17,15 @@
                 </ion-header-bar>
                 <ion-content>
                     <div class="list">
+                        <button type="button"
+                                class="btn btn-primary btn-lg btn-block"
+                                ngf-drag-over-class="'btn-default'"
+                                ngf-drop="uploadBanner($file)"
+                                ngf-select="uploadBanner($file)"
+                                ngf-pattern="'image/*'">
+                            &nbsp;Image Upload
+                        </button>
+
                         <img ng-src="{{srcImage || 'http://placehold.it/350x350'}}" id="srcImage" width="350 " height="350" style="display: block; margin: 0 auto;" />
                         <br />
                         <div class="row">

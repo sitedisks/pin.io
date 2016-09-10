@@ -1,10 +1,10 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 'endpoint',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, endpoint) {
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 'endpoint', 'Upload',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, endpoint, Upload) {
 
-            var useEndpoint = endpoint.LiveAPI;
-            //var useEndpoint = endpoint.LocalAPI;
+            //var useEndpoint = endpoint.LiveAPI;
+            var useEndpoint = endpoint.LocalAPI;
 
             var token;
             var map;
@@ -33,6 +33,23 @@
                 $scope.loadComments = loadComments;
                 $scope.moreDataCanBeLoaded = moreDataCanBeLoaded;
                 $scope.testCameraFile = testCameraFile;
+
+
+                $scope.uploadBanner = function (file) {
+                    Upload.upload({
+                        url: useEndpoint + '/pins/s3Image',
+                        method: 'POST',
+                        data: { file: file, 'directory': 'upload', 'fileName': 'TestImage', 'UserName': 'SiteDev' }
+                    }).then(function (resp) {
+                        console.log('Success [' + resp.config.data.file.name + '] uploaded. Response: ' + resp.data.ImageId);
+                    }, function (resp) {
+                        console.log('Error status: ' + resp.status);
+                    }, function (evt) {
+                        $scope.bannerProgress = parseInt(100.0 * evt.loaded / evt.total);
+                        console.log('progress: ' + $scope.bannerProgress + '% ' + evt.config.data.file.name);
+                    });
+                }
+
 
                 // functions
                 function locationLoad() {

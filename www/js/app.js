@@ -8,7 +8,8 @@ var app = angular.module('starter', [
     'ngCordova',
     'ionic-material',
     'ngResource',
-    'angularMoment'
+    'angularMoment',
+    'ngFileUpload'
 ]);
 
 app.run(['$ionicPlatform', function ($ionicPlatform) {
