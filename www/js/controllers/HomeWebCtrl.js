@@ -3,8 +3,8 @@
     app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 'endpoint', 'Upload',
         function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, endpoint, Upload) {
 
-            //var useEndpoint = endpoint.LiveAPI;
-            var useEndpoint = endpoint.LocalAPI;
+            var useEndpoint = endpoint.LiveAPI;
+            //var useEndpoint = endpoint.LocalAPI;
 
             var token;
             var map;
@@ -253,7 +253,7 @@
 
                 function takeImage() {
                     var options = {
-                        quality: 80,
+                        quality: 100,
                         destinationType: Camera.DestinationType.FILE_URI,
                         sourceType: Camera.PictureSourceType.CAMERA,
                         allowEdit: true,
@@ -265,40 +265,41 @@
                     };
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
-                        //$scope.srcImage = "data:image/jpeg;base64," + imageData;
                         $scope.srcImage = imageData;
-                        $scope.picData = imageData;
-                        $scope.ftLoad = true;
-
-                        var options = {
-                            fileKey: "file",
-                            fileName: "TestImage",
-                            chunkedMode: false, // ?
-                            mimeType: "image/jpg",
-                            params: { 'directory': 'upload', 'fileName': "TestImage" } // directory represents remote directory,  fileName represents final remote file name
-                        };
-
-                        //$cordovaFileTransfer.upload(useEndpoint + '/pins/image', $scope.srcImage, options).then(onSuccess, onError, onProgress);
-                        // https://www.thepolyglotdeveloper.com/2015/01/upload-files-remote-server-using-ionic-framework/
-                        // http://www.gajotres.net/using-cordova-file-transfer-plugin-with-ionic-framework/2/
-
-                        var imageServer = useEndpoint + '/pins/image';
-                        $cordovaFileTransfer.upload(imageServer, $scope.srcImage, options).then(function (result) {
-                            alert("server: " + imageServer + ". SUCCESS: " + JSON.stringify(result.response));
-                        }, function (err) {
-                            alert("server: " + imageServer + ". ERROR: " + JSON.stringify(err));
-                        }, function (progress) {
-                            // PROGRESS HANDLING GOES HERE
-                        });
-
+                        uploadImage();
                     }, function (err) {
                         // error
                     });
                 }
 
+                function uploadImage() {
+                    // upload image to s3
+                    var options = {
+                        fileKey: "file",
+                        fileName: "pin-image",
+                        chunkedMode: false, // ?
+                        mimeType: "image/jpg",
+                        params: { 'directory': 'upload', 'fileName': "pin-image" }
+                    };
+
+                    var imageServer = useEndpoint + '/pins/s3Image';
+                    $cordovaFileTransfer.upload(imageServer, $scope.srcImage, options)
+                        .then(function (result) {
+                        
+                            $scope.returnImgaeGUID = result.data;
+                            console.log('Success [' + result.config.data.file.name + '] uploaded. Response: ' + result.data);
+                        
+                        }, function (err) {
+                         
+                            console.log('Error status: ' + err.status);
+                        }, function (progress) {
+                            // PROGRESS HANDLING GOES HERE
+                        });
+                }
+
                 function chooseImage() {
                     var options = {
-                        quality: 80,
+                        quality: 100,
                         destinationType: Camera.DestinationType.FILE_URI,
                         sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
                         allowEdit: true,
@@ -310,16 +311,8 @@
                     };
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
-                        $scope.srcImage = "data:image/jpeg;base64," + imageData;
                         $scope.srcImage = imageData;
-                        $scope.picData = imageData;
-                        $scope.ftLoad = true;
-
-                        //window.resolveLocalFileSystemURI(imageData, function (fileEntry) {
-                        //    $scope.srcImage = fileEntry.nativeURL;
-                        //    $scope.picData = fileEntry.nativeURL;
-                        //    $scope.ftLoad = true;
-                        //});
+                        uploadImage();
                     }, function (err) {
                         // error
                     });
@@ -428,7 +421,7 @@
                 }
 
                 function testCameraFile() {
-                    alert($scope.picData);
+                    alert($scope.srcImage);
                 }
 
                 // initial
@@ -441,8 +434,8 @@
                 $scope.pinDetail = null;
                 $scope.pinComments = [];
                 $scope.newPin = { message: '', isPrivate: false };
-                $scope.picData = null;
-                $scope.ftLoad = false;
+                $scope.srcImage = null;
+                $scope.returnImgaeGUID = "Await for Image GUID";
             }
 
             // Cleanup the modal when we're done with it
