@@ -1,10 +1,7 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$cordovaFileTransfer', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 'endpoint', 'Upload',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $cordovaFileTransfer, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, endpoint, Upload) {
-
-            var useEndpoint = endpoint.LiveAPI;
-            //var useEndpoint = endpoint.LocalAPI;
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination) {
 
             var token;
             var map;
@@ -32,22 +29,19 @@
                 $scope.refreshComments = refreshComments;
                 $scope.loadComments = loadComments;
                 $scope.moreDataCanBeLoaded = moreDataCanBeLoaded;
+
                 $scope.testCameraFile = testCameraFile;
 
-
-                $scope.uploadBanner = function (file) {
-                    Upload.upload({
-                        url: useEndpoint + '/pins/s3Image',
-                        method: 'POST',
-                        data: { file: file, 'directory': 'upload', 'fileName': 'TestImage', 'UserName': 'testesttest' }
-                    }).then(function (resp) {
-                        console.log('Success [' + resp.config.data.file.name + '] uploaded. Response: ' + resp.data);
-                    }, function (resp) {
-                        console.log('Error status: ' + resp.status);
-                    }, function (evt) {
-                        $scope.bannerProgress = parseInt(100.0 * evt.loaded / evt.total);
-                        console.log('progress: ' + $scope.bannerProgress + '% ');
-                    });
+                $scope.uploadFile = function (file) {
+                    pinService.fileUploadSvc(file)
+                        .then(function (resp) {
+                            console.log('Success [' + resp.config.data.file.name + '] uploaded. Response: ' + resp.data);
+                        }, function (resp) {
+                            console.log('Error status: ' + resp.status);
+                        }, function (evt) {
+                            $scope.bannerProgress = parseInt(100.0 * evt.loaded / evt.total);
+                            console.log('progress: ' + $scope.bannerProgress + '% ');
+                        });
                 }
 
 
@@ -75,8 +69,6 @@
                         MapLoad();
                     });
                 }
-
-
 
                 function tokenLoad() {
                     try {
@@ -266,37 +258,12 @@
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
                         $scope.srcImage = imageData;
-                        uploadImage();
                     }, function (err) {
                         // error
                     });
                 }
 
-                function uploadImage() {
-                    // upload image to s3
-                    var options = {
-                        fileKey: "file",
-                        fileName: "pin-image",
-                        chunkedMode: false, // ?
-                        mimeType: "image/jpg",
-                        params: { 'directory': 'upload', 'fileName': "pin-image" }
-                    };
 
-                    var imageServer = useEndpoint + '/pins/s3Image';
-                    $cordovaFileTransfer.upload(imageServer, $scope.srcImage, options)
-                        .then(function (result) {
-                        
-                            var newImageGuid = result.response;
-                            $scope.returnImgaeGUID = "Yes uploaded: " + newImageGuid;
-                            //console.log('Success [' + result.config.data.file.name + '] uploaded. Response: ' + result.data);
-                        
-                        }, function (err) {
-                         
-                            console.log('Error status: ' + JSON.stringify(err));
-                        }, function (progress) {
-                            // PROGRESS HANDLING GOES HERE
-                        });
-                }
 
                 function chooseImage() {
                     var options = {
@@ -313,7 +280,6 @@
 
                     $cordovaCamera.getPicture(options).then(function (imageData) {
                         $scope.srcImage = imageData;
-                        uploadImage();
                     }, function (err) {
                         // error
                     });
@@ -347,26 +313,9 @@
                     //$scope.pinDetailsModal.remove();
                 }
 
-                function postNewPin(newpin) {
-
-                    var pin = {
-                        "Token": token,
-                        "Longitude": currentLng,
-                        "Latitude": currentLat,
-                        "Text": newpin.message,
-                        "IsPrivate": newpin.isPrivate
-                    };
-
-                    pinService.pinSvc().save(pin,
-                        function (data) {
-                            // new pin stored in mysql and mongo
-                            $scope.newPinModal.hide();
-                            //$scope.map.setClickable(true);
-                            //PinLoad();
-                        }, function (error) {
-                            // error handle
-                        });
-
+                function postNewPin() {
+                    // upload the image first return GUID 
+                    uploadImageS3();
                 }
 
                 function postNewComment(commentObj) {
@@ -425,6 +374,48 @@
                     alert($scope.srcImage);
                 }
 
+                function uploadImageS3() {
+                    pinService.loading(); // spin loading
+                    // upload image to s3
+                    if ($scope.srcImage != null) {
+                        pinService.imageUploadSvc($scope.srcImage)
+                            .then(function (result) {
+                                $scope.returnImgaeGUID = result.response.replace(/^"(.*)"$/, '$1');
+                                uploadPin();
+                            }, function (err) {
+                                console.log('Error status: ' + JSON.stringify(err));
+                            }, function (progress) {
+                                // PROGRESS HANDLING GOES HERE
+                            });
+                    } else {
+                        uploadPin();
+                    }
+
+                }
+
+                function uploadPin() {
+                    var pin = {
+                        "Token": token,
+                        "Longitude": currentLng,
+                        "Latitude": currentLat,
+                        "Text": $scope.newPin.message,
+                        "IsPrivate": $scope.newPin.isPrivate,
+                        "ImageUri": $scope.returnImgaeGUID
+                    };
+
+                    pinService.pinSvc().save(pin,
+                        function (data) {
+                            // new pin stored in mysql and mongo
+                            pinService.hideloading();
+                            $scope.newPinModal.hide();
+                            //$scope.map.setClickable(true);
+                            //PinLoad();
+                        }, function (error) {
+                            pinService.hideloading();
+                            // error handle
+                        });
+                }
+
                 // initial
                 tokenLoad(); // set the device unique token
                 locationLoad();
@@ -436,7 +427,7 @@
                 $scope.pinComments = [];
                 $scope.newPin = { message: '', isPrivate: false };
                 $scope.srcImage = null;
-                $scope.returnImgaeGUID = "Await for Image GUID";
+                $scope.returnImgaeGUID = null;
             }
 
             // Cleanup the modal when we're done with it
