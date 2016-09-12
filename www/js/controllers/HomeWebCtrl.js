@@ -286,12 +286,13 @@
                     $cordovaFileTransfer.upload(imageServer, $scope.srcImage, options)
                         .then(function (result) {
                         
-                            $scope.returnImgaeGUID = result.data;
-                            console.log('Success [' + result.config.data.file.name + '] uploaded. Response: ' + result.data);
+                            var newImageGuid = result.response;
+                            $scope.returnImgaeGUID = "Yes uploaded: " + newImageGuid;
+                            //console.log('Success [' + result.config.data.file.name + '] uploaded. Response: ' + result.data);
                         
                         }, function (err) {
                          
-                            console.log('Error status: ' + err.status);
+                            console.log('Error status: ' + JSON.stringify(err));
                         }, function (progress) {
                             // PROGRESS HANDLING GOES HERE
                         });
