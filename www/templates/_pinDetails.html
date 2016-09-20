@@ -1,0 +1,106 @@
+﻿<ion-modal-view>
+    <ion-header-bar class="bar-balanced">
+        <h1 class="title"></h1>
+        <button class="button button-icon button-clear ion-close" id="menu-popover" data-ng-click="closePinDetailsModal()"></button>
+    </ion-header-bar>
+    <ion-content>
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="refreshComments()"></ion-refresher>
+
+        <!-- Cards -->
+        <div class="list card stable-bg">
+            <div class="item item-avatar">
+                <img src="img/arya.jpg">
+                <h2>{{pinDetail.UserId}}</h2>
+                <p>{{pinDetail.Token}}</p>
+            </div>
+            <div class="item item-body">
+                <img data-ng-src="{{pinDetail.ImageUrl}}" />
+                <label class="item item-floating-label">
+                    {{pinDetail.Text}}
+                </label>
+                <p>
+                    <a class="subdued">12 Like</a>
+                    <a class="subdued">5 Comments</a>
+                </p>
+            </div>
+            <div class="item tabs tabs-secondary tabs-icon-left">
+                <a class="tab-item" data-ink-color="#336699" data-ink-opacity="0.5">
+                    <i class="icon ion-thumbsup"></i> Like
+                </a>
+                <a class="tab-item" data-ink-color="#336699" data-ink-opacity="0.5">
+                    <i class="icon ion-chatbox"></i> Comment
+                </a>
+                <a class="tab-item" data-ink-color="#336699" data-ink-opacity="0.5">
+                    <i class="icon ion-share"></i> Share
+                </a>
+            </div>
+        </div>
+
+        <ion-list>
+            <ion-item class="message-wrapper" data-ng-repeat="comment in pinComments">
+                <div ng-if="pinDetail.UserId !== comment.CommenterId">
+                    <img class="profile-pic left" src="img/material4.jpg" />
+
+                    <div class="chat-bubble left">
+                        <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
+                        <div class="message">{{comment.Comment}}</div>
+
+                        <div class="message-detail">
+                            <span class="bold">{{comment.CommenterDisplayName}}</span>,
+                            <span>{{comment.CommentDateTime}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="pinDetail.UserId === comment.CommenterId">
+                    <img class="profile-pic right" src="img/material4.jpg" />
+
+                    <div class="chat-bubble right">
+                        <!--<div class="message" ng-bind-html="message.text | nl2br" autolinker></div>-->
+                        <div class="message">{{comment.Comment}}</div>
+
+                        <div class="message-detail">
+                            <span class="bold">{{comment.CommenterDisplayName}}</span>,
+                            <span>{{comment.CommentDateTime}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf"></div>
+            </ion-item>
+        </ion-list>
+
+        <ion-infinite-scroll ng-if="moreDataCanBeLoaded()" on-infinite="loadComments()" distance="1%"></ion-infinite-scroll>
+
+    </ion-content>
+
+    <form name="commentForm" data-ng-submit="postNewComment(commentObj)" novalidate>
+        <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach>
+            <label class="item-input-wrapper">
+                <!--<textarea ng-model="input.message" value="" placeholder="Send a message..." required minlength="1" maxlength="1500" msd-elastic></textarea>-->
+                <textarea data-ng-model="commentObj.message" value="" placeholder="Leave a comment..." required minlength="1" maxlength="1500"></textarea>
+            </label>
+            <div class="footer-btn-wrap">
+                <button class="button button-icon icon ion-android-send footer-btn" type="submit"
+                        ng-disabled="!commentObj.message || commentObj.message === ''"></button>
+            </div>
+        </ion-footer-bar>
+    </form>
+
+    <!--<ion-footer-bar align-title="left" class="bar-assertive">
+        <div class="buttons">
+            <button class="button">Left Button</button>
+        </div>
+        <h1 class="title">Title!</h1>
+        <div class="buttons" ng-click="doSomething()">
+            <button class="button">Right Button</button>
+        </div>
+    </ion-footer-bar>-->
+    <!--<div class="bar bar-footer item-input-inset">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios7-search placeholder-icon"></i>
+            <input type="search" placeholder="Search">
+        </label>
+        <button class="button button-clear">
+            Cancel
+        </button>
+    </div>-->
+</ion-modal-view>

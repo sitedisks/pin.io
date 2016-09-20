@@ -18,6 +18,10 @@
     }).constant("pagination", {
         defaultPage: 1,
         row: 5
+    }).constant("s3Image", {
+        dev: "https://s3-ap-southeast-2.amazonaws.com/pinpiece-dev/Images/",
+        stage: "",
+        live: ""
     });
 
 })();

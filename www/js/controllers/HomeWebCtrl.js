@@ -1,7 +1,7 @@
 (function () {
     'use strict';
-    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination) {
+    app.controller('HomeWebCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 's3Image',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, s3Image) {
 
             var token;
             var map;
@@ -196,12 +196,16 @@
                             pinService.pinSvc().get({ pinId: pin.Id },
                                 function (pinData) {
                                     pinService.hideloading();
+                                 
+                                    if (!pinData.ImageUri)
+                                        pinData.ImageUri = "83f25ab2-f676-4def-87a6-67efc93b1f05"; // default image (Todo: should load from server random
+                                    pinData.ImageUrl = s3Image.dev + pinData.ImageUri;
+
                                     $scope.pinDetail = pinData;
 
                                     if (pinData.Id != null) {
                                         // get all comments for this PIN
                                         loadComments(commentPage, $scope.pinDetail.Id);
-
                                         openPinDetailsModal();
                                     }
                                     else {
@@ -461,14 +465,14 @@
 
 
             // register modal templates
-            $ionicModal.fromTemplateUrl('post-new-pin.html', {
+            $ionicModal.fromTemplateUrl('templates/_pinNew.html', {
                 scope: $scope,
                 animation: 'slide-in-up'
             }).then(function (modal) {
                 $scope.newPinModal = modal;
             });
 
-            $ionicModal.fromTemplateUrl('load-details-pin.html', {
+            $ionicModal.fromTemplateUrl('templates/_pinDetails.html', {
                 scope: $scope,
                 animation: 'slide-in-up'
             }).then(function (modal) {
