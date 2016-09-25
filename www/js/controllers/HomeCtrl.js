@@ -207,7 +207,7 @@
 
                             google.maps.event.addListener(marker, 'click', function () {
 
-                                pinService.loadPin().get({ pinId: pin.Id },
+                                pinService.pinSvc().get({ pinId: pin.Id },
                                         function (pinData) {
                                             if (pinData.Id != null)
                                                 alert(pinData.Text);

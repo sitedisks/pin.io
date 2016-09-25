@@ -16,10 +16,10 @@
 		    url: '/home',
 		    views: {
 		        'menuContent': {
-		            //templateUrl: 'templates/home.html',
-		            //controller: 'HomeCtrl'
-		            templateUrl: 'templates/homeWeb.html',
-		            controller: 'HomeWebCtrl'
+		            templateUrl: 'templates/home.html',
+		            controller: 'HomeCtrl'
+		            //templateUrl: 'templates/homeWeb.html',
+		            //controller: 'HomeWebCtrl'
 		        }
 		    }
 		})
