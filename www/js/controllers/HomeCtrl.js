@@ -5,11 +5,14 @@
 
 
             //var lat = -37.81198361286847, lng = 144.96133938623052;
-            var token = 'peter-test-galaxy-edge-7-002';
+            var token;
             var map;
             var mapDiv = document.getElementById("map");
             var currentLat = defaultLocation.lat;
             var currentLng = defaultLocation.lng;
+            var markersArray = [];
+            var commentPage = 1;
+            var commentTotal = -1;
 
             $ionicPlatform.ready(function () {
 
@@ -18,6 +21,9 @@
                 }
                 catch (err) {
                     console.log("Error " + err.message);
+                }
+                finally {
+                    token = 'not-real-device-test-only';
                 }
 
                 $scope.PinLoad = PinLoad;
@@ -58,7 +64,7 @@
                         });
 
                         //var infowindow = new google.maps.InfoWindow();
-                        var markersArray = [];
+                        //var markersArray = [];
                         var bounds = new google.maps.LatLngBounds();
                         map.clear();
                         $scope.map = map;
