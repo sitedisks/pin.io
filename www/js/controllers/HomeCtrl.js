@@ -45,13 +45,7 @@
                             }
                         };
 
-                        /* javascript google map 
-                        map = new google.maps.Map(mapDiv, {
-                            center: setPosition(lat, lng),
-                            zoom: 16,
-                            disableDefaultUI: true,
-                            mapTypeId: google.maps.MapTypeId.ROADMAP
-                        });*/
+                 
 
                         /* native google map */
                         map = plugin.google.maps.Map.getMap(mapDiv, {
@@ -61,59 +55,18 @@
                             }
                         });
 
-                        var infowindow = new google.maps.InfoWindow();
+                        //var infowindow = new google.maps.InfoWindow();
                         var markersArray = [];
                         var bounds = new google.maps.LatLngBounds();
                         map.clear();
                         $scope.map = map;
 
-
-                        // js map ready
-                        //google.maps.event.addListenerOnce($scope.map, 'idle', onMapReady);
-
+ 
                         // native map ready
                         map.addEventListener(plugin.google.maps.event.MAP_READY, onNativeMapReady);
 
                         // map ready
-                        function onMapReady() {
-                            var pinColor = PinColor.success;
-                            var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-                                    null, /* size is determined at runtime */
-                                    null, /* origin is 0,0 */
-                                    null, /* anchor is bottom center of the scaled image */
-                                    new google.maps.Size(31.5, 51)
-                                );
-
-                            var meMarker = new google.maps.Marker({
-                                map: $scope.map,
-                                animation: google.maps.Animation.DROP,
-                                position: setPosition(lat, lng),
-                                icon: pinImage
-                            });
-
-                            // reload
-                            pinService.reload().refresh(positionData,
-                                function (data) {
-                                    if (data.length > 0) {
-                                        angular.forEach(data, function (pin) {
-                                            addMarker(pin);
-                                        });
-
-                                        $scope.map.setCenter(bounds.getCenter());
-                                        $scope.map.fitBounds(bounds);
-                                        $scope.map.setZoom(map.getZoom());
-                                    }
-
-                                    //$ionicLoading.hide();
-                                    pinService.hideloading();
-                                },
-                                function (error) {
-                                    // failed to load api
-                                    //$ionicLoading.hide();
-                                    pinService.hideloading();
-                                });
-                        }
-
+                    
                         function onNativeMapReady() {
                             var currentMarker = {
                                 position: setNativePosition(lat, lng),
@@ -149,19 +102,15 @@
                                      $scope.map.animateCamera({
                                          'target': latLngBounds
                                      });
-                                     //$scope.map.setZoom(map.getZoom());
-
-                                     //$scope.map.setCenter(bounds.getCenter());
-                                     //$scope.map.fitBounds(bounds);
-                                     //$scope.map.setZoom(map.getZoom());
+                                   
                                  }
 
-                                 //$ionicLoading.hide();
+                          
                                  pinService.hideloading();
                              },
                              function (error) {
                                  // failed to load api
-                                 //$ionicLoading.hide();
+                             
                                  pinService.hideloading();
                              });
 
@@ -169,63 +118,7 @@
 
 
                         // add markers (pin)
-                        function addMarker(pin) {
-                            var readPinColor = PinColor.info;
-                            var readPinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + readPinColor,
-                               null, /* size is determined at runtime */
-                               null, /* origin is 0,0 */
-                               null, /* anchor is bottom center of the scaled image */
-                               new google.maps.Size(31.5, 51)
-                           );
-
-                            var markerLatLng = new google.maps.LatLng(pin.Latitude, pin.Longitude);
-                            bounds.extend(markerLatLng);
-
-                            var tipHtml = "<h5>Pin Piece:</h5> User:" + pin.UserId + "<h5>Token:" + pin.Token + "</h5><br/>What been told: " + pin.Text;
-                            if (pin.Distance) {
-                                if (pin.IsReadable)
-                                    tipHtml += "<h4>Readable</h4>";
-                                else {
-                                    tipHtml += "<h4>Too far away</h4><h5>distance: " + pin.Distance + " M</h5>";
-                                }
-                            }
-
-                            if (pin.IsReadable) {
-                                var marker = new google.maps.Marker({
-                                    position: markerLatLng,
-                                    map: map,
-                                    title: pin.Token,
-                                    icon: readPinImage,
-                                    infowindow: infowindow
-                                });
-                            } else {
-                                var marker = new google.maps.Marker({
-                                    position: markerLatLng,
-                                    map: map,
-                                    title: pin.Token,
-                                    infowindow: infowindow
-                                });
-                            }
-
-                            google.maps.event.addListener(marker, 'click', function () {
-
-                                pinService.pinSvc().get({ pinId: pin.Id },
-                                        function (pinData) {
-                                            if (pinData.Id != null)
-                                                alert(pinData.Text);
-                                            else
-                                                alert("Pin info not in mysql");
-                                        }, function (error) {
-                                            //log the error
-                                        });
-
-                                //this.infowindow.setContent(tipHtml);
-                                //this.infowindow.open(map, this);
-                            });
-
-                            markersArray.push(marker);
-                        }
-
+              
                         function addNativeMarker(pin) {
                             if (pin.IsReadable) {
                                 var marker = {
