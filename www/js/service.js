@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    app.service('pinService', ['$resource', '$ionicLoading', '$cordovaFileTransfer', 'Upload', 'endpoint', 'pagination',
-        function ($resource, $ionicLoading, $cordovaFileTransfer, Upload, endpoint, pagination) {
+    app.service('pinService', ['$resource', '$ionicLoading', '$cordovaFileTransfer', 'localStorageService', 'Upload', 'endpoint', 'pagination',
+        function ($resource, $ionicLoading, $cordovaFileTransfer, localStorageService, Upload, endpoint, pagination) {
 
             var useEndpoint = endpoint.LiveAPI;
             //var useEndpoint = endpoint.LocalAPI;
@@ -14,7 +14,10 @@
                 commentSvc: commentSvc,
 
                 fileUploadSvc: fileUploadSvc,
-                imageUploadSvc: imageUploadSvc, 
+                imageUploadSvc: imageUploadSvc,
+
+                storageSet: storageSet,
+                storageGet: storageGet,
 
                 loading: loading,
                 hideloading: hideloading
@@ -58,6 +61,14 @@
                 };
                 var imageServer = '/pins/s3Image';
                 return $cordovaFileTransfer.upload(useEndpoint + imageServer, imageSource, options);
+            }
+
+            function storageSet(key, val) {
+                return localStorageService.set(key, val);
+            }
+
+            function storageGet(key) {
+                return localStorageService.get(key);
             }
 
             function loading() {

@@ -9,6 +9,7 @@ var app = angular.module('starter', [
     'ionic-material',
     'ngResource',
     'angularMoment',
+    'LocalStorageModule',
     'ngFileUpload'
 ]);
 

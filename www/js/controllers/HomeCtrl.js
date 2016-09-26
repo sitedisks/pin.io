@@ -8,6 +8,8 @@
             var token = 'peter-test-galaxy-edge-7-002';
             var map;
             var mapDiv = document.getElementById("map");
+            var currentLat = defaultLocation.lat;
+            var currentLng = defaultLocation.lng;
 
             $ionicPlatform.ready(function () {
 
@@ -35,13 +37,13 @@
                     // start the geolocation 
                     $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
 
-                        var lat = position.coords.latitude;
-                        var lng = position.coords.longitude;
+                        currentLat = position.coords.latitude;
+                        currentLng = position.coords.longitude;
                         var positionData = {
                             "Token": token,
                             "Coord": {
-                                "lng": lng,
-                                "lat": lat
+                                "lng": currentLng,
+                                "lat": currentLat
                             }
                         };
 
@@ -50,7 +52,7 @@
                         /* native google map */
                         map = plugin.google.maps.Map.getMap(mapDiv, {
                             'camera': {
-                                'latLng': setNativePosition(lat, lng),
+                                'latLng': setNativePosition(currentLat, currentLng),
                                 'zoom': 12
                             }
                         });
@@ -69,9 +71,9 @@
                     
                         function onNativeMapReady() {
                             var currentMarker = {
-                                position: setNativePosition(lat, lng),
+                                position: setNativePosition(currentLat, currentLng),
                                 icon: 'blue',
-                                title: 'Your current location -> lat: ' + lat + ', lng: ' + lng
+                                title: 'Your current location -> lat: ' + currentLat + ', lng: ' + currentLng
                             };
 
                             $scope.map.addMarker({
@@ -98,7 +100,7 @@
 
                                    
                                      var latLngBounds = new plugin.google.maps.LatLngBounds(markersArray);
-                                     $scope.map.setCenter(setNativePosition(lat, lng));
+                                     $scope.map.setCenter(setNativePosition(currentLat, currentLng));
                                      $scope.map.animateCamera({
                                          'target': latLngBounds
                                      });
@@ -243,8 +245,8 @@
 
                             var pin = {
                                 "Token": token,
-                                "Longitude": lng,
-                                "Latitude": lat,
+                                "Longitude": currentLng,
+                                "Latitude": currentLat,
                                 "Text": newpin.message,
                                 "IsPrivate": newpin.isPrivate
                             };
