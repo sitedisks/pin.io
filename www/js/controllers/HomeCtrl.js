@@ -3,8 +3,6 @@
     app.controller('HomeCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 's3Image',
         function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, s3Image) {
 
-
-            //var lat = -37.81198361286847, lng = 144.96133938623052;
             var token;
             var map;
             var mapDiv = document.getElementById("map");
@@ -15,22 +13,11 @@
             var commentTotal = -1;
 
             $ionicPlatform.ready(function () {
+ 
+                $scope.locationLoad = locationLoad;
 
-                try {
-                    token = $cordovaDevice.getUUID();
-                }
-                catch (err) {
-                    console.log("Error " + err.message);
-                }
-                finally {
-                    token = 'not-real-device-test-only';
-                }
-
-                $scope.PinLoad = PinLoad;
-
-                PinLoad();
-
-                function PinLoad() {
+                // implement functions
+                function locationLoad() {
 
                     pinService.loading(); // spin loading
 
@@ -230,7 +217,7 @@
                             isPrivate: false
                         };
 
-                        $ionicModal.fromTemplateUrl('post-new-pin.html', {
+                        $ionicModal.fromTemplateUrl('templates/_pinNew.html', {
                             scope: $scope,
                             animation: 'slide-in-up'
                         }).then(function (modal) {
@@ -276,6 +263,24 @@
                     });
                 }
 
+                // helper function
+                function tokenLoad() {
+                    try {
+                        token = $cordovaDevice.getUUID();
+                        pinService.storageSet('deviceToken', token);
+                    }
+                    catch (err) {
+                        console.log("Error " + err.message);
+                    }
+                    finally {
+                        token = 'not-real-device-test-only';
+                    }
+                }
+
+
+                // initial
+                tokenLoad(); // set the device unique token
+                locationLoad();
 
             });
 
