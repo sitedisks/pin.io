@@ -19,6 +19,8 @@
                 // implement functions
                 function locationLoad() {
 
+                    //deleteMarkers();
+
                     pinService.loading(); // spin loading
 
                     var posOptions = {
@@ -32,6 +34,9 @@
 
                         currentLat = position.coords.latitude;
                         currentLng = position.coords.longitude;
+
+                        //MapLoad();
+
                         var positionData = {
                             "Token": token,
                             "Coord": {
@@ -40,8 +45,7 @@
                             }
                         };
 
-                 
-
+ 
                         /* native google map */
                         map = plugin.google.maps.Map.getMap(mapDiv, {
                             'camera': {
@@ -50,8 +54,7 @@
                             }
                         });
 
-                        //var infowindow = new google.maps.InfoWindow();
-                        //var markersArray = [];
+                  
                         var bounds = new google.maps.LatLngBounds();
                         map.clear();
                         $scope.map = map;
@@ -61,7 +64,6 @@
                         map.addEventListener(plugin.google.maps.event.MAP_READY, onNativeMapReady);
 
                         // map ready
-                    
                         function onNativeMapReady() {
                             var currentMarker = {
                                 position: setNativePosition(currentLat, currentLng),
@@ -113,7 +115,6 @@
 
 
                         // add markers (pin)
-              
                         function addNativeMarker(pin) {
                             if (pin.IsReadable) {
                                 var marker = {
@@ -159,14 +160,9 @@
                         }
 
                         // set latLng
-                        function setPosition(lat, lng) {
-                            return new google.maps.LatLng(lat, lng);
-                        }
-
                         function setNativePosition(lat, lng) {
                             return new plugin.google.maps.LatLng(lat, lng);
                         }
-
 
 
                         // start camera
