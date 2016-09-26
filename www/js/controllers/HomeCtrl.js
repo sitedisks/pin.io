@@ -1,7 +1,7 @@
 (function () {
     'use strict';
-    app.controller('HomeCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicLoading', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor',
-        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicLoading, $ionicPlatform, $ionicModal, pinService, PinColor) {
+    app.controller('HomeCtrl', ['$rootScope', '$scope', '$stateParams', '$cordovaDevice', '$cordovaGeolocation', '$cordovaCamera', '$ionicPopup', '$ionicPlatform', '$ionicModal', 'pinService', 'PinColor', 'defaultLocation', 'pagination', 's3Image',
+        function ($rootScope, $scope, $stateParams, $cordovaDevice, $cordovaGeolocation, $cordovaCamera, $ionicPopup, $ionicPlatform, $ionicModal, pinService, PinColor, defaultLocation, pagination, s3Image) {
 
 
             //var lat = -37.81198361286847, lng = 144.96133938623052;
@@ -24,9 +24,7 @@
 
                 function PinLoad() {
 
-                    $ionicLoading.show({
-                        template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
-                    });
+                    pinService.loading(); // spin loading
 
                     var posOptions = {
                         enableHighAccuracy: true,
@@ -94,7 +92,7 @@
                             });
 
                             // reload
-                            pinService.reload().save(positionData,
+                            pinService.reload().refresh(positionData,
                                 function (data) {
                                     if (data.length > 0) {
                                         angular.forEach(data, function (pin) {
@@ -106,11 +104,13 @@
                                         $scope.map.setZoom(map.getZoom());
                                     }
 
-                                    $ionicLoading.hide();
+                                    //$ionicLoading.hide();
+                                    pinService.hideloading();
                                 },
                                 function (error) {
                                     // failed to load api
-                                    $ionicLoading.hide();
+                                    //$ionicLoading.hide();
+                                    pinService.hideloading();
                                 });
                         }
 
@@ -136,7 +136,7 @@
                             markersArray.push(currentMarker);
 
                             // reload
-                            pinService.reload().save(positionData,
+                            pinService.reload().refresh(positionData,
                              function (data) {
                                  if (data.length > 0) {
                                      angular.forEach(data, function (pin) {
@@ -156,11 +156,13 @@
                                      //$scope.map.setZoom(map.getZoom());
                                  }
 
-                                 $ionicLoading.hide();
+                                 //$ionicLoading.hide();
+                                 pinService.hideloading();
                              },
                              function (error) {
                                  // failed to load api
-                                 $ionicLoading.hide();
+                                 //$ionicLoading.hide();
+                                 pinService.hideloading();
                              });
 
                         }
@@ -367,7 +369,8 @@
                         }
 
                     }, function (err) {
-                        $ionicLoading.hide();
+                        //$ionicLoading.hide();
+                        pinService.hideloading();
                         console.log(err);
                     });
                 }
