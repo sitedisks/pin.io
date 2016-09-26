@@ -29,9 +29,10 @@
                         maximumAge: 0
                     };
 
-                    // start the geolocation 
-                    $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
 
+                    // 2> location ready
+                    $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+                        // use device location
                         currentLat = position.coords.latitude;
                         currentLng = position.coords.longitude;
 
@@ -55,8 +56,8 @@
                         });
 
                   
-                        var bounds = new google.maps.LatLngBounds();
-                        map.clear();
+                        //var bounds = new google.maps.LatLngBounds();
+                        map.clear(); // native only?
                         $scope.map = map;
 
  
@@ -159,12 +160,6 @@
                             markersArray.push(marker);
                         }
 
-                        // set latLng
-                        function setNativePosition(lat, lng) {
-                            return new plugin.google.maps.LatLng(lat, lng);
-                        }
-
-
                         // start camera
                         $scope.takeImage = function () {
                             var options = {
@@ -257,6 +252,11 @@
                         pinService.hideloading();
                         console.log(err);
                     });
+                }
+
+                // set latLng
+                function setNativePosition(lat, lng) {
+                    return new plugin.google.maps.LatLng(lat, lng);
                 }
 
                 // helper function
