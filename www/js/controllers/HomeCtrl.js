@@ -286,17 +286,29 @@
                         }, function (marker) {
                             //  marker.showInfoWindow();
                             marker.on('click', function () {
-
+                                pinService.loading(); // spin loading
                                 // api load pin details
-                                pinService.loadPin().get({ pinId: pin.Id },
+                                pinService.pinSvc().get({ pinId: pin.Id },
                                     function (pinData) {
-                                        if (pinData.Id != null)
-                                            alert(pinData.Text);
-                                        else
-                                            alert("Pin info not in mysql");
+                                        pinService.hideloading();
+
+                                        if (!pinData.ImageUri)
+                                            pinData.ImageUri = "83f25ab2-f676-4def-87a6-67efc93b1f05"; // default image (Todo: should load from server random
+                                        pinData.ImageUrl = s3Image.dev + pinData.ImageUri;
+
+                                        $scope.pinDetail = pinData;
+
+                                        if (pinData.Id != null) {
+                                            // get all comments for this PIN
+                                            loadComments(commentPage, $scope.pinDetail.Id);
+                                            openPinDetailsModal();
+                                        }
+                                        else {
+                                            errorHandler();
+                                        }
                                     }, function (error) {
                                         //log the error
-                                        alert(marker.get('marker').title);
+                                        pinService.hideloading();
                                     });
 
                                 //alert(marker.get('marker').title);
