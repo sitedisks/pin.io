@@ -13,8 +13,10 @@
             var commentTotal = -1;
 
             $ionicPlatform.ready(function () {
- 
+
                 $scope.locationLoad = locationLoad;
+                $scope.takeImage = takeImage;
+                $scope.chooseImage = chooseImage;
 
                 // implement functions
                 function locationLoad() {
@@ -29,178 +31,13 @@
                         maximumAge: 0
                     };
 
-
                     // 2> location ready
                     $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
                         // use device location
                         currentLat = position.coords.latitude;
                         currentLng = position.coords.longitude;
 
-                        //MapLoad();
-
-                        var positionData = {
-                            "Token": token,
-                            "Coord": {
-                                "lng": currentLng,
-                                "lat": currentLat
-                            }
-                        };
-
- 
-                        /* native google map */
-                        map = plugin.google.maps.Map.getMap(mapDiv, {
-                            'camera': {
-                                'latLng': setNativePosition(currentLat, currentLng),
-                                'zoom': 12
-                            }
-                        });
-
-                  
-                        //var bounds = new google.maps.LatLngBounds();
-                        map.clear(); // native only?
-                        $scope.map = map;
-
- 
-                        // native map ready
-                        map.addEventListener(plugin.google.maps.event.MAP_READY, onNativeMapReady);
-
-                        // map ready
-                        function onNativeMapReady() {
-                            var currentMarker = {
-                                position: setNativePosition(currentLat, currentLng),
-                                icon: 'blue',
-                                title: 'Your current location -> lat: ' + currentLat + ', lng: ' + currentLng
-                            };
-
-                            $scope.map.addMarker({
-                                'marker': currentMarker,
-                                'position': currentMarker.position,
-                                'icon': currentMarker.icon,
-                                animation: plugin.google.maps.Animation.DROP
-                            }, function (marker) {
-                                //  marker.showInfoWindow();
-                                marker.on('click', function () {
-                                    alert(marker.get('marker').title);
-                                });
-                            });
-
-                            markersArray.push(currentMarker);
-
-                            // reload
-                            pinService.reload().refresh(positionData,
-                             function (data) {
-                                 if (data.length > 0) {
-                                     angular.forEach(data, function (pin) {
-                                         addNativeMarker(pin);
-                                     });
-
-                                   
-                                     var latLngBounds = new plugin.google.maps.LatLngBounds(markersArray);
-                                     $scope.map.setCenter(setNativePosition(currentLat, currentLng));
-                                     $scope.map.animateCamera({
-                                         'target': latLngBounds
-                                     });
-                                   
-                                 }
-
-                          
-                                 pinService.hideloading();
-                             },
-                             function (error) {
-                                 // failed to load api
-                             
-                                 pinService.hideloading();
-                             });
-
-                        }
-
-
-                        // add markers (pin)
-                        function addNativeMarker(pin) {
-                            if (pin.IsReadable) {
-                                var marker = {
-                                    position: setNativePosition(pin.Latitude, pin.Longitude),
-                                    icon: 'green',
-                                    title: 'Pin location -> lat: ' + pin.Latitude + ', lng: ' + pin.Longitude
-                                };
-                            }
-                            else {
-                                var marker = {
-                                    position: setNativePosition(pin.Latitude, pin.Longitude),
-                                    icon: 'yellow',
-                                    title: 'Pin location -> lat: ' + pin.Latitude + ', lng: ' + pin.Longitude
-                                };
-                            }
-
-
-                            $scope.map.addMarker({
-                                'marker': marker,
-                                'position': marker.position,
-                                'icon': marker.icon
-                            }, function (marker) {
-                                //  marker.showInfoWindow();
-                                marker.on('click', function () {
-
-                                    // api load pin details
-                                    pinService.loadPin().get({ pinId: pin.Id },
-                                        function (pinData) {
-                                            if (pinData.Id != null)
-                                                alert(pinData.Text);
-                                            else
-                                                alert("Pin info not in mysql");
-                                        }, function (error) {
-                                            //log the error
-                                            alert(marker.get('marker').title);
-                                        });
-
-                                    //alert(marker.get('marker').title);
-                                });
-                            });
-
-                            markersArray.push(marker);
-                        }
-
-                        // start camera
-                        $scope.takeImage = function () {
-                            var options = {
-                                quality: 80,
-                                destinationType: Camera.DestinationType.DATA_URL,
-                                sourceType: Camera.PictureSourceType.CAMERA,
-                                allowEdit: true,
-                                encodingType: Camera.EncodingType.JPEG,
-                                targetWidth: 350,
-                                targetHeight: 350,
-                                popoverOptions: CameraPopoverOptions,
-                                saveToPhotoAlbum: false
-                            };
-
-                            $cordovaCamera.getPicture(options).then(function (imageData) {
-                                $scope.srcImage = "data:image/jpeg;base64," + imageData;
-                            }, function (err) {
-                                // error
-                            });
-                        }
-
-                        // choose from album
-                        $scope.chooseImage = function () {
-                            var options = {
-                                quality: 80,
-                                destinationType: Camera.DestinationType.DATA_URL,
-                                sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
-                                allowEdit: true,
-                                encodingType: Camera.EncodingType.JPEG,
-                                targetWidth: 350,
-                                targetHeight: 350,
-                                popoverOptions: CameraPopoverOptions,
-                                saveToPhotoAlbum: false
-                            };
-
-                            $cordovaCamera.getPicture(options).then(function (imageData) {
-                                $scope.srcImage = "data:image/jpeg;base64," + imageData;
-                            }, function (err) {
-                                // error
-                            });
-                        }
+                        MapLoad();
 
                         // add new post pin
                         $scope.newPin = {
@@ -248,10 +85,51 @@
                         }
 
                     }, function (err) {
-                        //$ionicLoading.hide();
-                        pinService.hideloading();
-                        console.log(err);
+ 
+                        MapLoad();
                     });
+                }
+
+                function takeImage() {
+                    var options = {
+                        quality: 100,
+                        destinationType: Camera.DestinationType.FILE_URI,
+                        sourceType: Camera.PictureSourceType.CAMERA,
+                        allowEdit: true,
+                        encodingType: Camera.EncodingType.JPEG,
+                        targetWidth: 350,
+                        targetHeight: 350,
+                        popoverOptions: CameraPopoverOptions,
+                        saveToPhotoAlbum: false
+                    };
+
+                    $cordovaCamera.getPicture(options).then(function (imageData) {
+                        $scope.srcImage = imageData;
+                    }, function (err) {
+                        // error
+                    });
+                }
+
+                function chooseImage() {
+                    var options = {
+                        quality: 100,
+                        destinationType: Camera.DestinationType.FILE_URI,
+                        sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+                        allowEdit: true,
+                        encodingType: Camera.EncodingType.JPEG,
+                        targetWidth: 350,
+                        targetHeight: 350,
+                        popoverOptions: CameraPopoverOptions,
+                        saveToPhotoAlbum: false
+                    };
+
+                    $cordovaCamera.getPicture(options).then(function (imageData) {
+                        $scope.srcImage = imageData;
+                    }, function (err) {
+                        // error
+                    });
+
+                    //$cordovaCamera.cleanup().then(); // only for FILE_URI
                 }
 
                 // set latLng
@@ -270,6 +148,123 @@
                     }
                     finally {
                         token = 'not-real-device-test-only';
+                    }
+                }
+
+                function MapLoad() {
+                    /* native google map */
+                    map = plugin.google.maps.Map.getMap(mapDiv, {
+                        'camera': {
+                            'latLng': setNativePosition(currentLat, currentLng),
+                            'zoom': 12
+                        }
+                    });
+
+                    map.clear(); // native only?
+                    $scope.map = map;
+
+
+                    // native map ready
+                    map.addEventListener(plugin.google.maps.event.MAP_READY, onNativeMapReady);
+
+                    // map ready
+                    function onNativeMapReady() {
+                        var currentMarker = {
+                            position: setNativePosition(currentLat, currentLng),
+                            icon: 'blue',
+                            title: 'Your current location -> lat: ' + currentLat + ', lng: ' + currentLng
+                        };
+
+                        $scope.map.addMarker({
+                            'marker': currentMarker,
+                            'position': currentMarker.position,
+                            'icon': currentMarker.icon,
+                            animation: plugin.google.maps.Animation.DROP
+                        }, function (marker) {
+                            //  marker.showInfoWindow();
+                            marker.on('click', function () {
+                                alert(marker.get('marker').title);
+                            });
+                        });
+
+                        markersArray.push(currentMarker);
+
+                        var currentLocation = {
+                            "Token": token,
+                            "Coord": {
+                                "lng": currentLng,
+                                "lat": currentLat
+                            }
+                        };
+
+                        // reload
+                        pinService.reload().refresh(currentLocation,
+                         function (data) {
+                             if (data.length > 0) {
+                                 angular.forEach(data, function (pin) {
+                                     addNativeMarker(pin);
+                                 });
+                                 var latLngBounds = new plugin.google.maps.LatLngBounds(markersArray);
+                                 $scope.map.setCenter(setNativePosition(currentLat, currentLng));
+                                 $scope.map.animateCamera({
+                                     'target': latLngBounds
+                                 });
+
+                             }
+                             pinService.hideloading();
+                         },
+                         function (error) {
+                             // failed to load api
+
+                             pinService.hideloading();
+                         });
+
+                    }
+
+
+                    // add markers (pin)
+                    function addNativeMarker(pin) {
+                        if (pin.IsReadable) {
+                            var marker = {
+                                position: setNativePosition(pin.Latitude, pin.Longitude),
+                                icon: 'green',
+                                title: 'Pin location -> lat: ' + pin.Latitude + ', lng: ' + pin.Longitude
+                            };
+                        }
+                        else {
+                            var marker = {
+                                position: setNativePosition(pin.Latitude, pin.Longitude),
+                                icon: 'yellow',
+                                title: 'Pin location -> lat: ' + pin.Latitude + ', lng: ' + pin.Longitude
+                            };
+                        }
+
+
+                        $scope.map.addMarker({
+                            'marker': marker,
+                            'position': marker.position,
+                            'icon': marker.icon
+                        }, function (marker) {
+                            //  marker.showInfoWindow();
+                            marker.on('click', function () {
+
+                                // api load pin details
+                                pinService.loadPin().get({ pinId: pin.Id },
+                                    function (pinData) {
+                                        if (pinData.Id != null)
+                                            alert(pinData.Text);
+                                        else
+                                            alert("Pin info not in mysql");
+                                    }, function (error) {
+                                        //log the error
+                                        alert(marker.get('marker').title);
+                                    });
+
+                                //alert(marker.get('marker').title);
+                            });
+                        });
+
+                        markersArray.push(marker);
                     }
                 }
 
