@@ -17,6 +17,15 @@
                 $scope.locationLoad = locationLoad;
                 $scope.takeImage = takeImage;
                 $scope.chooseImage = chooseImage;
+                $scope.openNewPinModal = openNewPinModal;
+                $scope.closeNewPinModal = closeNewPinModal;
+                $scope.openPinDetailsModal = openPinDetailsModal;
+                $scope.closePinDetailsModal = closePinDetailsModal;
+                $scope.postNewPin = postNewPin;
+                $scope.postNewComment = postNewComment;
+                $scope.refreshComments = refreshComments;
+                $scope.loadComments = loadComments;
+                $scope.moreCommentsCanBeLoaded = moreCommentsCanBeLoaded;
 
                 // implement functions
                 function locationLoad() {
@@ -38,51 +47,6 @@
                         currentLng = position.coords.longitude;
 
                         MapLoad();
-
-                        // add new post pin
-                        $scope.newPin = {
-                            message: '',
-                            isPrivate: false
-                        };
-
-                        $ionicModal.fromTemplateUrl('templates/_pinNew.html', {
-                            scope: $scope,
-                            animation: 'slide-in-up'
-                        }).then(function (modal) {
-                            $scope.modal = modal;
-                        });
-
-                        $scope.openModal = function () {
-                            $scope.map.setClickable(false);
-                            $scope.modal.show();
-                        }
-
-                        $scope.closeModal = function () {
-                            $scope.modal.hide();
-                            $scope.map.setClickable(true);
-                        };
-
-                        $scope.postNewPin = function (newpin) {
-
-                            var pin = {
-                                "Token": token,
-                                "Longitude": currentLng,
-                                "Latitude": currentLat,
-                                "Text": newpin.message,
-                                "IsPrivate": newpin.isPrivate
-                            };
-
-                            pinService.postPin().save(pin,
-                                function (data) {
-                                    // new pin stored in mysql and mongo
-                                    $scope.modal.hide();
-                                    $scope.map.setClickable(true);
-                                    //PinLoad();
-                                }, function (error) {
-                                    // error handle
-                                });
-
-                        }
 
                     }, function (err) {
  
@@ -132,10 +96,85 @@
                     //$cordovaCamera.cleanup().then(); // only for FILE_URI
                 }
 
-                // set latLng
-                function setNativePosition(lat, lng) {
-                    return new plugin.google.maps.LatLng(lat, lng);
+                function openNewPinModal() {
+                    $scope.map.setClickable(false);
+                    $scope.newPinModal.show();
                 }
+
+                function closeNewPinModal() {
+                    $scope.map.setClickable(true);
+                    $scope.newPinModal.hide();
+                    //$scope.newPinModal.remove();
+                }
+
+                function openPinDetailsModal() {
+                    $scope.map.setClickable(true);
+                    $scope.pinDetailsModal.show();
+                }
+
+                function closePinDetailsModal() {
+                    $scope.map.setClickable(true);
+                    $scope.pinDetailsModal.hide();
+                    //$scope.pinDetailsModal.remove();
+                }
+
+                function postNewPin() {
+                    // upload the image first return GUID 
+                    uploadImageS3();
+                }
+
+                function postNewComment(commentObj) {
+                    var comment = {
+                        "Token": token,
+                        "Comment": commentObj.message,
+                        "Latitude": currentLat,
+                        "Longitude": currentLng
+                    };
+
+                    pinService.commentSvc().save({ pinId: $scope.pinDetail.Id }, comment,
+                        function (data) {
+                            //what happens once submit comment
+                        },
+                        function (error) { });
+                }
+
+                function refreshComments() {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Refresh',
+                        template: 'Comments refreshed'
+                    });
+                    $scope.$broadcast('scroll.refreshComplete');
+                }
+
+                function loadComments() {
+                    if ($scope.pinDetail) {
+                        pinService.commentSvc(commentPage).get({ pinId: $scope.pinDetail.Id },
+                            function (data) {
+                                commentTotal = data.total;
+                                var list = data.list;
+
+                                angular.forEach(list, function (item) {
+                                    $scope.pinComments.push(item);
+                                });
+                                commentPage++;
+
+                                $scope.$broadcast('scroll.infiniteScrollComplete');
+                            }, function (error) {
+
+                                errorHandler();
+                            });
+                    }
+
+                }
+
+                function moreCommentsCanBeLoaded() {
+                    if (commentTotal == -1)
+                        return true;
+                    if ($scope.pinComments.length < commentTotal)
+                        return true;
+                    return false;
+                }
+
 
                 // helper function
                 function tokenLoad() {
@@ -268,11 +307,115 @@
                     }
                 }
 
+                function errorHandler() {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Unknow Error',
+                        template: 'Please reload the app try again'
+                    });
+                }
+
+                function setNativePosition(lat, lng) {
+                    return new plugin.google.maps.LatLng(lat, lng);
+                }
+
+                function uploadImageS3() {
+                    pinService.loading(); // spin loading
+                    // upload image to s3
+                    if ($scope.srcImage != null) {
+                        pinService.imageUploadSvc($scope.srcImage)
+                            .then(function (result) {
+                                $scope.returnImgaeGUID = result.response.replace(/^"(.*)"$/, '$1');
+                                uploadPin();
+                            }, function (err) {
+                                console.log('Error status: ' + JSON.stringify(err));
+                            }, function (progress) {
+                                // PROGRESS HANDLING GOES HERE
+                            });
+                    } else {
+                        uploadPin();
+                    }
+
+                }
+
+                function uploadPin() {
+                    var pin = {
+                        "Token": token,
+                        "Longitude": currentLng,
+                        "Latitude": currentLat,
+                        "Text": $scope.newPin.message,
+                        "IsPrivate": $scope.newPin.isPrivate,
+                        "ImageUri": $scope.returnImgaeGUID
+                    };
+
+                    pinService.pinSvc().save(pin,
+                        function (data) {
+                            // new pin stored in mysql and mongo
+                            pinService.hideloading();
+                            $scope.newPinModal.hide();
+                            $scope.map.setClickable(true);
+                            //PinLoad();
+                        }, function (error) {
+                            pinService.hideloading();
+                            // error handle
+                        });
+                }
 
                 // initial
                 tokenLoad(); // set the device unique token
                 locationLoad();
 
+            });
+
+            function scopeVariables() {
+                $scope.pinDetail = null;
+                $scope.pinComments = [];
+                $scope.newPin = { message: '', isPrivate: false };
+                $scope.srcImage = null;
+                $scope.returnImgaeGUID = null;
+            }
+
+            // Cleanup the modal when we're done with it
+            $scope.$on('$destroy', function () {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'destroy',
+                    template: 'general destroy'
+                });
+
+            });
+            // Execute action on hide modal
+            $scope.$on('modal.hidden', function () {
+
+                // clean up scope variables
+                scopeVariables();
+                commentPage = 1;
+                commentTotal = -1;
+                //var alertPopup = $ionicPopup.alert({
+                //    title: 'hidden',
+                //    template: 'general hidden'
+                //});
+
+            });
+            // Execute action on remove modal
+            $scope.$on('modal.removed', function () {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'removed',
+                    template: 'general removed'
+                });
+            });
+
+            // register modal templates
+            $ionicModal.fromTemplateUrl('templates/_pinNew.html', {
+                scope: $scope,
+                animation: 'slide-in-up'
+            }).then(function (modal) {
+                $scope.newPinModal = modal;
+            });
+
+            $ionicModal.fromTemplateUrl('templates/_pinDetails.html', {
+                scope: $scope,
+                animation: 'slide-in-up'
+            }).then(function (modal) {
+                $scope.pinDetailsModal = modal;
             });
 
         }]);
