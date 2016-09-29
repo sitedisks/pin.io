@@ -12,7 +12,10 @@
             var commentPage = 1;
             var commentTotal = -1;
 
+            // 1> device ready
             $ionicPlatform.ready(function () {
+
+                scopeVariables();
 
                 $scope.locationLoad = locationLoad;
                 $scope.takeImage = takeImage;
@@ -134,6 +137,7 @@
                     pinService.commentSvc().save({ pinId: $scope.pinDetail.Id }, comment,
                         function (data) {
                             //what happens once submit comment
+                            // refresh the comment list
                         },
                         function (error) { });
                 }
@@ -202,7 +206,6 @@
                     map.clear(); // native only?
                     $scope.map = map;
 
-
                     // native map ready
                     map.addEventListener(plugin.google.maps.event.MAP_READY, onNativeMapReady);
 
@@ -220,7 +223,6 @@
                             'icon': currentMarker.icon,
                             animation: plugin.google.maps.Animation.DROP
                         }, function (marker) {
-                            //  marker.showInfoWindow();
                             marker.on('click', function () {
                                 alert(marker.get('marker').title);
                             });
@@ -278,20 +280,17 @@
                             };
                         }
 
-
                         $scope.map.addMarker({
                             'marker': marker,
                             'position': marker.position,
                             'icon': marker.icon
                         }, function (marker) {
-                            //  marker.showInfoWindow();
                             marker.on('click', function () {
                                 pinService.loading(); // spin loading
                                 // api load pin details
                                 pinService.pinSvc().get({ pinId: pin.Id },
                                     function (pinData) {
                                         pinService.hideloading();
-
                                         if (!pinData.ImageUri)
                                             pinData.ImageUri = "83f25ab2-f676-4def-87a6-67efc93b1f05"; // default image (Todo: should load from server random
                                         pinData.ImageUrl = s3Image.dev + pinData.ImageUri;
@@ -310,8 +309,6 @@
                                         //log the error
                                         pinService.hideloading();
                                     });
-
-                                //alert(marker.get('marker').title);
                             });
                         });
 
